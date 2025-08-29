@@ -16,7 +16,7 @@
     }
     html, body { height: 100%; }
     body {
-      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
       background: radial-gradient(1200px 800px at 20% -10%, #162032 0%, transparent 60%),
                   radial-gradient(1000px 600px at 120% 10%, #1a1228 0%, transparent 60%),
                   var(--bg);
@@ -25,7 +25,7 @@
     .wrap { max-width: 920px; margin: 40px auto; padding: 0 20px; }
     .card { background: var(--card); border: 1px solid var(--ring); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
     header { padding: 24px 24px 8px; }
-    h1 { margin: 0; font-size: 28px; letter-spacing: .2px; }
+    h1 { margin: 0; font-size: 28px; }
     p.sub { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
 
     .search { display: flex; gap: 10px; align-items: center; padding: 16px 24px 20px; border-top: 1px solid var(--ring); }
@@ -33,12 +33,41 @@
       flex: 1; font-size: 16px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--ring); outline: none; background: #0f1117; color: var(--text);
     }
     .search input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(79,140,255,.18); }
-    .hint { font-size: 12px; color: var(--muted); }
+    .hint { font-size: 12px; color: var(--muted); transition: opacity 0.4s ease; }
+
+    .filters, .subfilters { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 24px 12px; align-items: center; }
+    .filters button,
+    .subfilters button {
+      background: #0f1220;
+      border: 1px solid var(--ring);
+      border-radius: 999px;
+      padding: 6px 12px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .filters button.active,
+    .subfilters button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    #randombtn { margin-left:auto; }
+
+    .subfilters {
+      opacity: 0; max-height: 0; overflow: hidden;
+      transition: opacity 0.4s ease, max-height 0.4s ease;
+      padding-left: 40px;
+    }
+    .subfilters.show {
+      opacity: 1; max-height: 60px;
+    }
 
     .results { border-top: 1px solid var(--ring); }
     table { width: 100%; border-collapse: collapse; }
-    thead th { text-align: left; font-weight: 600; color: #cdd6e6; font-size: 13px; letter-spacing: .3px; text-transform: uppercase; padding: 14px 16px; }
-    tbody td { padding: 14px 16px; border-top: 1px solid #1c2230; vertical-align: middle; }
+    thead th { text-align: left; padding: 14px 16px; font-size: 13px; text-transform: uppercase; }
+    tbody td { padding: 14px 16px; border-top: 1px solid #1c2230; }
     tbody tr:hover { background: #0f131d; }
 
     .plu-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--chip); border: 1px solid var(--ring); padding: 6px 10px; border-radius: 999px; font-weight: 600; }
@@ -51,12 +80,54 @@
     .empty { padding: 20px 24px; color: var(--muted); }
     .accent { color: var(--accent); }
 
-    @media (max-width: 560px){
-      thead { display: none; }
-      tbody tr { display: grid; grid-template-columns: 1fr auto; gap: 6px; padding: 10px 0; }
-      tbody td { border: 0; padding: 4px 16px; }
-      tbody td:nth-child(1){ order: 1; font-weight: 600; }
-      tbody td:nth-child(2){ order: 2; justify-self: end; }
+    /* Random flash */
+    #randomFlash {
+      display:none;
+      position:fixed;
+      top:40%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      font-size:40px;
+      font-weight:bold;
+      color:var(--accent);
+      pointer-events:none;
+      white-space:nowrap;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    /* Animations */
+    @keyframes shooting {
+      0%   { opacity:0; transform: translateX(-150%) translateY(-50%) scale(0.3) rotate(-20deg); }
+      50%  { opacity:1; transform: translateX(0%) translateY(0%) scale(1.4) rotate(0deg); }
+      100% { opacity:0; transform: translateX(150%) translateY(50%) scale(0.3) rotate(20deg); }
+    }
+    @keyframes bounce {
+      0% { transform:scale(0); opacity:0; }
+      30% { transform:scale(1.5); opacity:1; }
+      60% { transform:scale(0.9); }
+      100% { transform:scale(1); opacity:0; }
+    }
+    @keyframes spin {
+      0% { transform:rotate(0deg) scale(0.3); opacity:0; }
+      40% { opacity:1; }
+      100% { transform:rotate(720deg) scale(1.3); opacity:0; }
+    }
+    @keyframes fade {
+      0% { opacity:0; }
+      20% { opacity:1; transform:scale(1.3); }
+      80% { opacity:1; }
+      100% { opacity:0; }
+    }
+    @keyframes slide {
+      0% { transform:translateY(-200%) scale(0.5); opacity:0; }
+      30% { opacity:1; }
+      70% { transform:translateY(0) scale(1.5); }
+      100% { transform:translateY(200%) scale(0.5); opacity:0; }
+    }
+    @keyframes zoom {
+      0% { transform:scale(0.1); opacity:0; }
+      50% { transform:scale(2); opacity:1; }
+      100% { transform:scale(0.5); opacity:0; }
     }
   </style>
 </head>
@@ -73,13 +144,31 @@
         <span class="hint" id="count"></span>
       </div>
 
+      <div class="filters">
+        <button data-type="" class="active">All</button>
+        <button data-type="B">Bakery</button>
+        <button data-type="F">Fruit</button>
+        <button data-type="V">Veg</button>
+        <button data-type="W">Beverage</button>
+        <button id="randombtn">🎲 Random</button>
+      </div>
+      <p id="mainhint" class="hint" style="padding: 0 24px 8px;">💡 Select a category to see items</p>
+
+      <div class="subfilters" id="subfilters">
+        <button data-type="L">Loafs</button>
+        <button data-type="R">Rolls</button>
+        <button data-type="C">Cakes</button>
+        <button data-type="P">Pastry</button>
+        <button data-type="D">Donuts</button>
+      </div>
+      <p id="subhint" class="hint" style="padding: 0 24px 8px; display:none;">💡 Select a bakery type for more detail</p>
+
+      <div id="randomFlash"></div>
+
       <div class="results">
         <table>
           <thead>
-            <tr>
-              <th>Item</th>
-              <th>PLU</th>
-            </tr>
+            <tr><th>Item</th><th>PLU</th></tr>
           </thead>
           <tbody id="rows"></tbody>
         </table>
@@ -93,187 +182,274 @@
   </div>
 
 <script>
-  // --- Dataset (from your Excel) ---
-  const DATA = [
-    { name: "Chocolate Hazelnut Croissant", plu: 170 },
-    { name: "All Butter Croissant", plu: 70 },
-    { name: "Almond Croissant", plu: 389 },
-    { name: "All Butter Pain au Chocolate", plu: 81 },
-    { name: "Maple and Pecan Plait", plu: 54 },
-    { name: "Apple Turnover", plu: 55 },
-    { name: "Pastel de Nata", plu: 244 },
-    { name: "Ultimate Chocolate Brownie", plu: 323 },
-    { name: "Jam Filled Doughnut", plu: 92 },
-    { name: "Choc Hazelnut Filled Doughnut", plu: 148 },
-    { name: "Chocolate Iced Doughnut", plu: 426 },
-    { name: "Pink Iced Ring Doughnut", plu: 405 },
-    { name: "Filled Muffins Assorted", plu: 141 },
-    { name: "Petit Pain", plu: 36 },
-    { name: "Demi Baguette", plu: 49 },
-    { name: "Large French Baguette", plu: 51 },
-    { name: "White Crusty Roll", plu: 33 },
-    { name: "Stone Baked Panini Roll", plu: 38 },
-    { name: "White Artisan Baguette", plu: 391 },
-    { name: "Crusty Sourdough Rye Bloomer", plu: 343 },
-    { name: "Pretzel", plu: 125 },
-    { name: "Vegetable Pizza Slice", plu: 71 },
-    { name: "Belgian Bun", plu: 381 },
-    { name: "Toffee Filled Yum Yum", plu: 118 },
-    { name: "Low GI Loaf", plu: 395 },
-    { name: "Stone Baked White Roll", plu: 127 },
-    { name: "Seeded Sourdough Loaf", plu: 420 },
-    { name: "Pizza Margherita White Cheddar", plu: 75 },
-    { name: "Loose Bananas", plu: 30 },
-    { name: "Loose Limes", plu: 11 },
-    { name: "Loose Grapefruit", plu: 10 },
-    { name: "Loose Kiwi", plu: 86 },
-    { name: "Loose British Pears", plu: 50 },
-    { name: "Loose Figs", plu: 2 },
-    { name: "Pineapple", plu: 52 },
-    { name: "Pomegranate", plu: 16 },
-    { name: "Loose Mango", plu: 43 },
-    { name: "Honeydew Melon", plu: 45 },
-    { name: "Galia Melon", plu: 44 },
-    { name: "Cantaloupe Melon", plu: 161 },
-    { name: "Medium Avocado", plu: 365 },
-    { name: "Large Avocado", plu: 366 },
-    { name: "Pistachios Roasted & Salted", plu: 69 },
-    { name: "Loose Red Apples", plu: 428 },
-    { name: "Loose Sweet Potatoes", plu: 24 },
-    { name: "Aubergine", plu: 58 },
-    { name: "Cucumber", plu: 6 },
-    { name: "Spring Onions", plu: 317 },
-    { name: "Courgette", plu: 68 },
-    { name: "Loose Vine Tomatoes", plu: 17 },
-    { name: "Loose Red Pepper", plu: 83 },
-    { name: "Ginger Loose", plu: 56 },
-    { name: "Large Loose Garlic", plu: 335 },
-    { name: "Butternut Squash", plu: 20 },
-    { name: "Swede", plu: 79 },
-    { name: "Cauliflower", plu: 363 },
-    { name: "Red Cabbage", plu: 8 },
-    { name: "White Cabbage", plu: 64 },
-    { name: "Loose Baking Potatoes", plu: 95 },
-    { name: "Baked Cookies Assorted", plu: 138 },
-    { name: "Cheese Pretzel Roll", plu: 438 },
-    { name: "Low GI Roll", plu: 104 },
-    { name: "Mozzarella & Pesto Focaccia", plu: 387 },
-    { name: "Oats and Honey Loaf", plu: 425 },
-    { name: "Pain au Raisin", plu: 48 },
-    { name: "Pain Suisse au Chocolat", plu: 463 },
-    { name: "Sticky Cinnamon Bun", plu: 456 },
-    { name: "Tiger Baton", plu: 427 },
-    { name: "Tiger Bloomer", plu: 27 },
-    { name: "Large White Sourdough Bloomer", plu: 481 },
-    { name: "Cheese Twist", plu: 479 },
-    { name: "Ancient Grain Roll", plu: 300 },
-    { name: "Large Empire Biscuits Frozen", plu: 318 },
-    { name: "Bunched Beetroot", plu: 320 },
-    { name: "Loose Corn on the Cob", plu: 21 },
-    { name: "Loose Nectarines", plu: 505 },
-    { name: "Pretzel Roll", plu: 485 },
-    { name: "Loose Peaches", plu: 507 },
-    { name: "White Sourdough Loaf", plu: 416 },
-    { name: "Persimmon", plu: 82 },
-    { name: "Mozzarella & Pesto Pizza", plu: 606 },
-    { name: "Caramel Suisse", plu: 536 },
-    { name: "XL Avocado", plu: 367 },
-	{ name: "Matisse Melon", plu: 374 },
-	{ name: "Watermelon", plu: 147 },
-	{ name: "Pumpkin Seed Roll", plu: 40 },
-	{ name: "Lemon Millona Sqaure", plu: 552 },
-	{ name: "School Cake", plu: 531 },
-	{ name: "Triple Choc Blondie", plu: 451 },
-	{ name: "Cheesecake Brownie", plu: 430 },
-	{ name: "Half & Half Cookie", plu: 540 },
-	{ name: "Raspb & Cream Muffin", plu: 555 },
-	{ name: "Sticky Toffee Traybake", plu: 554 },
-	{ name: "Vic Sponge Muffin", plu: 487 },
-	{ name: "Choc&Caramel Cookie", plu: 551 },
-	{ name: "Tiramisu Loaf Cake", plu: 544 },
-	{ name: "Brioche Croissant", plu: 516 },
-	{ name: "Pain au Double Choc", plu: 483 },
-	{ name: "Cheese Cover Pretzel", plu: 539 },
-	{ name: "Caramel Cunch Donut", plu: 519 },
-	{ name: "Cookies&Cream Doughn", plu: 546 },
-	{ name: "WhiteMilk Choc Donut", plu: 510 },
-	{ name: "Chocolate Cronut", plu: 466 },
-	{ name: "Sugar Cronut", plu: 457 },
-	{ name: "Spinach and Feta Borek", plu: 538 },
-	{ name: "Millionaie Shortbread", plu: 515 },
-	{ name: "Focaccia Roll", plu: 605 },
-	{ name: "Salted Caramel Bun", plu: 470 },
-	{ name: "Chocolate Twist", plu: 443 },
-	{ name: "WChoc & Speculoos", plu: 607 },
-	{ name: "Loose Carrots", plu: 342 },
-	
+/* --- DATASET (shortened here, paste your full one back in) --- */
+const DATA = [
+  { name: "Chocolate Hazelnut Croissant", plu: 170, type: "P" },
+  { name: "All Butter Croissant", plu: 70, type: "P" },
+  { name: "Almond Croissant", plu: 389, type: "P" },
+  { name: "All Butter Pain au Chocolate", plu: 81, type: "P" },
+  { name: "Maple and Pecan Plait", plu: 54, type: "P" },
+  { name: "Apple Turnover", plu: 55, type: "P" },
+  { name: "Pastel de Nata", plu: 244, type: "P" },
+  { name: "Ultimate Chocolate Brownie", plu: 323, type: "C" },
+  { name: "Jam Filled Doughnut", plu: 92, type: "D" },
+  { name: "Choc Hazelnut Filled Doughnut", plu: 148, type: "D" },
+  { name: "Chocolate Iced Doughnut", plu: 426, type: "D" },
+  { name: "Pink Iced Ring Doughnut", plu: 405, type: "D" },
+  { name: "Filled Muffins Assorted", plu: 141, type: "C" },
+  { name: "Petit Pain", plu: 36, type: "R" },
+  { name: "Demi Baguette", plu: 49, type: "R" },
+  { name: "Large French Baguette", plu: 51, type: "R" },
+  { name: "White Crusty Roll", plu: 33, type: "R" },
+  { name: "Stone Baked Panini Roll", plu: 38, type: "R" },
+  { name: "White Artisan Baguette", plu: 391, type: "R" },
+  { name: "Crusty Sourdough Rye Bloomer", plu: 343, type: "L" },
+  { name: "Pretzel", plu: 125, type: "P" },
+  { name: "Vegetable Pizza Slice", plu: 71, type: "P" },
+  { name: "Belgian Bun", plu: 381, type: "P" },
+  { name: "Toffee Filled Yum Yum", plu: 118, type: "D" },
+  { name: "Low GI Loaf", plu: 395, type: "L" },
+  { name: "Stone Baked White Roll", plu: 127, type: "R" },
+  { name: "Seeded Sourdough Loaf", plu: 420, type: "L" },
+  { name: "Pizza Margherita White Cheddar", plu: 75, type: "P" },
+  { name: "Loose Bananas", plu: 30, type: "F" },
+  { name: "Loose Limes", plu: 11, type: "F" },
+  { name: "Loose Grapefruit", plu: 10, type: "F" },
+  { name: "Loose Kiwi", plu: 86, type: "F" },
+  { name: "Loose British Pears", plu: 50, type: "F" },
+  { name: "Loose Figs", plu: 2, type: "F" },
+  { name: "Pineapple", plu: 52, type: "F" },
+  { name: "Pomegranate", plu: 16, type: "F" },
+  { name: "Loose Mango", plu: 43, type: "F" },
+  { name: "Honeydew Melon", plu: 45, type: "F" },
+  { name: "Galia Melon", plu: 44, type: "F" },
+  { name: "Cantaloupe Melon", plu: 161, type: "F" },
+  { name: "Medium Avocado", plu: 365, type: "F" },
+  { name: "Large Avocado", plu: 366, type: "F" },
+  { name: "Pistachios Roasted & Salted", plu: 69, type: "F" },
+  { name: "Loose Red Apples", plu: 428, type: "F" },
+  { name: "Loose Sweet Potatoes", plu: 24, type: "V" },
+  { name: "Aubergine", plu: 58, type: "V" },
+  { name: "Cucumber", plu: 6, type: "V" },
+  { name: "Spring Onions", plu: 317, type: "V" },
+  { name: "Courgette", plu: 68, type: "V" },
+  { name: "Loose Vine Tomatoes", plu: 17, type: "V" },
+  { name: "Loose Red Pepper", plu: 83, type: "V" },
+  { name: "Ginger Loose", plu: 56, type: "V" },
+  { name: "Large Loose Garlic", plu: 335, type: "V" },
+  { name: "Butternut Squash", plu: 20, type: "V" },
+  { name: "Swede", plu: 79, type: "V" },
+  { name: "Cauliflower", plu: 363, type: "V" },
+  { name: "Red Cabbage", plu: 8, type: "V" },
+  { name: "White Cabbage", plu: 64, type: "V" },
+  { name: "Loose Baking Potatoes", plu: 95, type: "V" },
+  { name: "Baked Cookies Assorted", plu: 138, type: "C" },
+  { name: "Cheese Pretzel Roll", plu: 438, type: "R" },
+  { name: "Low GI Roll", plu: 104, type: "R" },
+  { name: "Mozzarella & Pesto Focaccia", plu: 387, type: "P" },
+  { name: "Oats and Honey Loaf", plu: 425, type: "L" },
+  { name: "Pain au Raisin", plu: 48, type: "P" },
+  { name: "Pain Suisse au Chocolat", plu: 463, type: "P" },
+  { name: "Sticky Cinnamon Bun", plu: 456, type: "P" },
+  { name: "Tiger Baton", plu: 427, type: "L" },
+  { name: "Tiger Bloomer", plu: 27, type: "L" },
+  { name: "Large White Sourdough Bloomer", plu: 481, type: "L" },
+  { name: "Cheese Twist", plu: 479, type: "P" },
+  { name: "Ancient Grain Roll", plu: 300, type: "R" },
+  { name: "Large Empire Biscuits Frozen", plu: 318, type: "C" },
+  { name: "Bunched Beetroot", plu: 320, type: "V" },
+  { name: "Loose Corn on the Cob", plu: 21, type: "V" },
+  { name: "Loose Nectarines", plu: 505, type: "F" },
+  { name: "Pretzel Roll", plu: 485, type: "R" },
+  { name: "Loose Peaches", plu: 507, type: "F" },
+  { name: "White Sourdough Loaf", plu: 416, type: "L" },
+  { name: "Persimmon", plu: 82, type: "F" },
+  { name: "Mozzarella & Pesto Pizza", plu: 606, type: "P" },
+  { name: "Caramel Suisse", plu: 536, type: "P" },
+  { name: "XL Avocado", plu: 367, type: "F" },
+  { name: "Matisse Melon", plu: 374, type: "F" },
+  { name: "Watermelon", plu: 147, type: "F" },
+  { name: "Pumpkin Seed Roll", plu: 40, type: "R" },
+  { name: "Lemon Millona Sqaure", plu: 552, type: "C" },
+  { name: "School Cake", plu: 531, type: "C" },
+  { name: "Triple Choc Blondie", plu: 451, type: "C" },
+  { name: "Cheesecake Brownie", plu: 430, type: "C" },
+  { name: "Half & Half Cookie", plu: 540, type: "C" },
+  { name: "Raspb & Cream Muffin", plu: 555, type: "C" },
+  { name: "Sticky Toffee Traybake", plu: 554, type: "C" },
+  { name: "Vic Sponge Muffin", plu: 487, type: "C" },
+  { name: "Choc&Caramel Cookie", plu: 551, type: "C" },
+  { name: "Tiramisu Loaf Cake", plu: 544, type: "C" },
+  { name: "Brioche Croissant", plu: 516, type: "P" },
+  { name: "Pain au Double Choc", plu: 483, type: "P" },
+  { name: "Cheese Cover Pretzel", plu: 539, type: "P" },
+  { name: "Caramel Cunch Donut", plu: 519, type: "D" },
+  { name: "Cookies&Cream Doughn", plu: 546, type: "D" },
+  { name: "WhiteMilk Choc Donut", plu: 510, type: "D" },
+  { name: "Chocolate Cronut", plu: 466, type: "D" },
+  { name: "Sugar Cronut", plu: 457, type: "D" },
+  { name: "Spinach and Feta Borek", plu: 538, type: "P" },
+  { name: "Millionaie Shortbread", plu: 515, type: "C" },
+  { name: "Focaccia Roll", plu: 605, type: "R" },
+  { name: "Salted Caramel Bun", plu: 470, type: "P" },
+  { name: "Chocolate Twist", plu: 443, type: "P" },
+  { name: "WChoc & Speculoos", plu: 607, type: "P" },
+  { name: "Loose Carrots", plu: 342, type: "V" }
+];
 
+const TYPE_LABELS = { 
+  B: "Bakery",
+  L: "Loaf",
+  R: "Roll",
+  C: "Cake",
+  P: "Pastry",
+  D: "Donut",
+  F: "Fruit",
+  V: "Veg",
+  W: "Beverage"
+};
+
+const ENRICHED = DATA.map(d => ({...d, nameLc: d.name.toLowerCase()}));
+
+const q = document.getElementById('q');
+const rows = document.getElementById('rows');
+const empty = document.getElementById('empty');
+const total = document.getElementById('total');
+const count = document.getElementById('count');
+const filterButtons = document.querySelectorAll('.filters button[data-type]');
+const subfilters = document.getElementById('subfilters');
+const subButtons = subfilters.querySelectorAll('button');
+const mainhint = document.getElementById('mainhint');
+const subhint = document.getElementById('subhint');
+const randombtn = document.getElementById('randombtn');
+const randomFlash = document.getElementById('randomFlash');
+
+let activeType = "";
+
+total.textContent = `${DATA.length} items loaded`;
+
+function render(list){
+  rows.innerHTML = '';
+  empty.hidden = list.length !== 0;
+  count.textContent = list.length ? `${list.length} match${list.length===1?'':'es'}` : '';
+
+  for(const item of list){
+    const tr = document.createElement('tr');
+    const tdName = document.createElement('td');
+    tdName.innerHTML = `${item.name} (<strong>${TYPE_LABELS[item.type]}</strong>)`;
+    const tdPlu = document.createElement('td');
+
+    const chip = document.createElement('span');
+    chip.className = 'plu-chip';
+    chip.innerHTML = `<span>${item.plu}</span>`;
+
+    const btn = document.createElement('button');
+    btn.className = 'copy';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(String(item.plu));
+        btn.textContent = 'Copied!';
+        setTimeout(()=> btn.textContent = 'Copy', 1200);
+      } catch(e){ alert('Clipboard blocked'); }
+    });
+
+    tdPlu.appendChild(chip);
+    tdPlu.appendChild(document.createTextNode(' '));
+    tdPlu.appendChild(btn);
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdPlu);
+    rows.appendChild(tr);
+  }
+}
+
+function filter(query){
+  const qTrim = query.trim().toLowerCase();
+  let list = ENRICHED;
+
+  if(activeType){
+    if(activeType === "B"){
+      list = list.filter(d => ["L","R","C","P","D"].includes(d.type));
+    } else {
+      list = list.filter(d => d.type === activeType);
+    }
+  }
+
+  if(qTrim){
+    if(/^\d+$/.test(qTrim)){
+      list = list.filter(d => String(d.plu).includes(qTrim));
+    } else {
+      const parts = qTrim.split(/\s+/).filter(Boolean);
+      list = list.filter(d => parts.every(p => d.nameLc.includes(p)));
+    }
+  }
+
+  render(list);
+}
+
+q.addEventListener('input', () => filter(q.value));
+
+filterButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    filterButtons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeType = btn.dataset.type;
+
+    if(activeType !== "" && mainhint) mainhint.style.display = "none";
+
+    if(activeType === "B"){
+      subfilters.classList.add('show');
+      subhint.style.display = "block"; 
+    } else {
+      subfilters.classList.remove('show');
+      subhint.style.display = "none"; 
+      subButtons.forEach(b=>b.classList.remove('active'));
+    }
+
+    filter(q.value);
+  });
+});
+
+subButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    subButtons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeType = btn.dataset.type;
+    if(subhint) subhint.style.display = "none";
+    filter(q.value);
+  });
+});
+
+// 🎲 Random button with random styles
+randombtn.addEventListener('click', ()=>{
+  const item = DATA[Math.floor(Math.random()*DATA.length)];
+  randomFlash.textContent = `${item.name} (PLU ${item.plu})`;
+  randomFlash.style.display = "block";
+  randomFlash.style.animation = "none"; 
+  void randomFlash.offsetWidth; 
+
+  // Random style
+  const animations = [
+    "shooting 2s ease forwards",
+    "bounce 1.5s ease forwards",
+    "spin 2s ease forwards",
+    "fade 2.5s ease forwards",
+    "slide 2.5s ease forwards",
+    "zoom 2s ease forwards"
   ];
+  const colors = ["#ff4757","#ffa502","#2ed573","#1e90ff","#eccc68","#ff6b81","#70a1ff","#7bed9f"];
+  const fonts = ["cursive","fantasy","monospace","serif","sans-serif","Impact","Comic Sans MS"];
 
-  // Precompute lowercase names for faster filtering
-  const ENRICHED = DATA.map(d => ({...d, nameLc: d.name.toLowerCase()}));
+  randomFlash.style.color = colors[Math.floor(Math.random()*colors.length)];
+  randomFlash.style.fontFamily = fonts[Math.floor(Math.random()*fonts.length)];
+  randomFlash.style.fontSize = (Math.floor(Math.random()*20)+40) + "px";
 
-  const q = document.getElementById('q');
-  const rows = document.getElementById('rows');
-  const empty = document.getElementById('empty');
-  const total = document.getElementById('total');
-  const count = document.getElementById('count');
+  const chosen = animations[Math.floor(Math.random()*animations.length)];
+  randomFlash.style.animation = chosen;
+});
 
-  total.textContent = `${DATA.length} items loaded`;
-
-  function render(list){
-    rows.innerHTML = '';
-    empty.hidden = list.length !== 0;
-    count.textContent = list.length ? `${list.length} match${list.length===1?'':'es'}` : '';
-
-    for(const item of list){
-      const tr = document.createElement('tr');
-      const tdName = document.createElement('td');
-      tdName.textContent = item.name;
-      const tdPlu = document.createElement('td');
-
-      const chip = document.createElement('span');
-      chip.className = 'plu-chip';
-      chip.innerHTML = `<span>${item.plu}</span>`;
-
-      const btn = document.createElement('button');
-      btn.className = 'copy';
-      btn.textContent = 'Copy';
-      btn.title = 'Copy PLU to clipboard';
-      btn.addEventListener('click', async () => {
-        try { await navigator.clipboard.writeText(String(item.plu));
-          btn.textContent = 'Copied!'; setTimeout(()=> btn.textContent = 'Copy', 1200);
-        } catch(e){ alert('Clipboard blocked by browser'); }
-      });
-
-      tdPlu.appendChild(chip); tdPlu.appendChild(document.createTextNode(' ')); tdPlu.appendChild(btn);
-
-      tr.appendChild(tdName); tr.appendChild(tdPlu);
-      rows.appendChild(tr);
-    }
-  }
-
-  function filter(query){
-    const qTrim = query.trim();
-    if(!qTrim){ render(ENRICHED); return; }
-
-    const isNumeric = /^\d+$/.test(qTrim);
-
-    if(isNumeric){
-      const qNum = Number(qTrim);
-      render(ENRICHED.filter(d => String(d.plu).includes(qTrim)));
-      return;
-    }
-
-    const parts = qTrim.toLowerCase().split(/\s+/).filter(Boolean);
-    render(ENRICHED.filter(d => parts.every(p => d.nameLc.includes(p))));
-  }
-
-  q.addEventListener('input', () => filter(q.value));
-  q.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ q.value=''; filter(''); q.focus(); }});
-
-  // Initial render
-  render(ENRICHED);
+render(ENRICHED);
 </script>
 </body>
 </html>
